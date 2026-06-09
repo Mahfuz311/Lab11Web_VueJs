@@ -9,7 +9,7 @@
 
 ---
 
-## Langkah-langkah Penyelesaian
+## 🧩 Langkah-Langkah Praktikum
 
 ### 1. Persiapan Folder dan File
 Membuat direktori baru `lab11_vuejs` di dalam folder `htdocs` XAMPP dengan struktur file:
