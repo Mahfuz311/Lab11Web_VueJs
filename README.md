@@ -43,5 +43,45 @@ Saat Frontend (localhost) mencoba mengambil data dari Backend (localhost:8080), 
 - Menambahkan fungsi `__construct()` yang berisi *header* `Access-Control-Allow-Origin: *` beserta metode dan *header* lain yang diizinkan.
 
 ---
+
+# Laporan Praktikum 12: VueJS Komponen dan Routing (Single Page Application)
+
+## Tujuan Praktikum
+1. Memahami konsep komponen pada Framework VueJS untuk memecah antarmuka menjadi bagian-bagian modular.
+2. Memahami konsep *Client-Side Routing* untuk membangun *Single Page Application* (SPA).
+3. Mengimplementasikan komponen dan *routing* menggunakan Vue Router berbasis CDN pada aplikasi Frontend API.
+
+---
+
+## 🧩 Langkah-Langkah Praktikum
+
+### 1. Persiapan Vue Router dan Struktur Direktori
+- Membuka file `index.html` dan menambahkan pustaka **Vue Router** melalui CDN tepat di bawah pustaka VueJS.
+- Membuat folder baru `assets/js/components/` untuk menyimpan file-file komponen agar kode lebih terstruktur dan modular.
+
+### 2. Membuat Komponen Halaman
+Memecah antarmuka menjadi tiga komponen utama yang berdiri sendiri:
+- **`Home.js`**: Berisi *template* untuk halaman Beranda/Selamat Datang.
+- **`Artikel.js`**: Memindahkan seluruh logika CRUD (Create, Read, Update, Delete) artikel dan tabel antarmuka dari praktikum sebelumnya ke dalam satu komponen terisolasi.
+- **`About.js`**: Membuat komponen baru yang berisi profil singkat mahasiswa (Nama, NIM, Kelas, Program Studi, Kampus) beserta **Foto Profil/Avatar** untuk memenuhi tugas praktikum.
+
+### 3. Mengonfigurasi Router pada `app.js`
+Memodifikasi file `app.js` utama untuk mengatur *routing*:
+- Mendefinisikan pemetaan (*mapping*) rute URL ke masing-masing komponen (`/` ke Home, `/artikel` ke Artikel, `/about` ke About).
+- Membuat *instance router* menggunakan `createRouter` dan `createWebHashHistory()`.
+- Menginisialisasi aplikasi Vue dan menyambungkannya dengan *router* (`app.use(router)`).
+
+### 4. Memodifikasi Master Layout (`index.html`)
+- Memperbarui menu navigasi dengan menggunakan elemen `<router-link to="...">` agar perpindahan halaman ditangani oleh Vue Router, bukan oleh browser konvensional.
+- Menyediakan tag `<router-view></router-view>` sebagai area penampung dinamis tempat komponen akan di-*render* secara bergantian berdasarkan URL yang aktif.
+
+### 5. Hasil Pengujian (Testing SPA)
+Aplikasi kini berjalan penuh sebagai SPA. Saat menu navigasi diklik, halaman berpindah secara instan tanpa ada proses *hard-reload* atau *refresh* pada browser.
+
+<img src="https://github.com/Mahfuz311/Lab11Web_VueJs/blob/7df9a8b091a3ae4f84efc9de14d3638e9ba25faf/ss/praktikum12.1.png">
+<img src="https://github.com/Mahfuz311/Lab11Web_VueJs/blob/7df9a8b091a3ae4f84efc9de14d3638e9ba25faf/ss/praktikum12.2.png">
+<img src="https://github.com/Mahfuz311/Lab11Web_VueJs/blob/7df9a8b091a3ae4f84efc9de14d3638e9ba25faf/ss/praktikum12.3.png">
+
+---
 **Repository by:** Mahfuz Fauzi
 **Mata Kuliah:** Pemrograman Web 2
