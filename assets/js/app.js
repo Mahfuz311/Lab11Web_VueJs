@@ -3,6 +3,43 @@ const { createRouter, createWebHashHistory } = VueRouter;
 
 const apiUrl = 'http://localhost:8080';
 
+// =========================================================
+// IMPLEMENTASI AXIOS INTERCEPTORS (Penyuntik Token Otomatis)
+// =========================================================
+
+// 1. Menyuntikkan token otomatis ke setiap request
+axios.interceptors.request.use(
+    (config) => {
+        // Ambil token dari local storage browser
+        const token = localStorage.getItem('userToken');
+        // Jika token tersedia, masukkan ke dalam HTTP Header Authorization Bearer
+        if (token) {
+            config.headers['Authorization'] = 'Bearer ' + token;
+        }
+        return config;
+    },
+    (error) => {
+        return Promise.reject(error);
+    }
+);
+
+// 2. Tangkap secara global jika server merespon dengan error 401 (Unauthorized)
+axios.interceptors.response.use(
+    (response) => {
+        return response;
+    },
+    (error) => {
+        if (error.response && error.response.status === 401) {
+            alert('Sesi Anda telah berakhir atau Token tidak sah. Silakan login kembali.');
+            localStorage.clear(); // Bersihkan local storage
+            window.location.href = '#/login'; // Tendang paksa ke halaman login
+            window.location.reload();
+        }
+        return Promise.reject(error);
+    }
+);
+// =========================================================
+
 // 1. Definisikan mapping rute & Meta-Auth
 const routes = [
     { path: '/', component: Home },
@@ -51,8 +88,7 @@ const app = createApp({
     methods: {
         logout() {
             if (confirm('Apakah Anda yakin ingin keluar aplikasi?')) {
-                localStorage.removeItem('isLoggedIn');
-                localStorage.removeItem('userToken');
+                localStorage.clear(); // Gunakan clear agar token juga terhapus bersih
                 this.isLoggedIn = false;
                 this.$router.push('/');
             }
