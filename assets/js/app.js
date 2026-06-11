@@ -1,20 +1,64 @@
 const { createApp } = Vue;
 const { createRouter, createWebHashHistory } = VueRouter;
 
-// Definisikan Rute URL ke Komponen
+const apiUrl = 'http://localhost:8080';
+
+// 1. Definisikan mapping rute & Meta-Auth
 const routes = [
     { path: '/', component: Home },
-    { path: '/artikel', component: Artikel },
-    { path: '/about', component: About }
+    { path: '/login', component: Login },
+    { 
+        path: '/artikel', 
+        component: Artikel,
+        meta: { requiresAuth: true } // Terkunci
+    },
+    { 
+        path: '/about', 
+        component: About,
+        meta: { requiresAuth: true } // Terkunci (Sesuai tugas)
+    }
 ];
 
-// Buat instance router
 const router = createRouter({
     history: createWebHashHistory(),
     routes
 });
 
-// Inisialisasi Aplikasi Vue dan gunakan Router
-const app = createApp({});
+// 2. Navigation Guards (Satpam Pencegat Akses)
+router.beforeEach((to, from, next) => {
+    const isAuthenticated = localStorage.getItem('isLoggedIn') === 'true';
+    
+    // Jika rute butuh login TAPI user belum login
+    if (to.matched.some(record => record.meta.requiresAuth) && !isAuthenticated) {
+        alert('Akses Ditolak! Anda harus login terlebih dahulu.');
+        next('/login'); // Lempar ke form login
+    } else {
+        next(); // Izinkan masuk
+    }
+});
+
+// 3. Inisialisasi Aplikasi Vue
+const app = createApp({
+    data() {
+        return {
+            isLoggedIn: false
+        }
+    },
+    mounted() {
+        // Cek status login saat aplikasi pertama dimuat
+        this.isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+    },
+    methods: {
+        logout() {
+            if (confirm('Apakah Anda yakin ingin keluar aplikasi?')) {
+                localStorage.removeItem('isLoggedIn');
+                localStorage.removeItem('userToken');
+                this.isLoggedIn = false;
+                this.$router.push('/');
+            }
+        }
+    }
+});
+
 app.use(router);
 app.mount('#app');
