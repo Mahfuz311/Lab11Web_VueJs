@@ -89,3 +89,28 @@ form button {
 .close:hover {
     color: black;
 }
+
+/* Navigasi SPA */
+.nav-menu {
+    padding: 10px;
+    background: #eff1ff;
+    border-radius: 5px;
+    margin-bottom: 15px;
+}
+.nav-menu a {
+    text-decoration: none;
+    color: #3152d6;
+    font-weight: bold;
+    padding: 5px 10px;
+}
+/* Style otomatis saat route aktif */
+.router-link-exact-active {
+    background-color: #3152d6;
+    color: #ffffff !important;
+    border-radius: 3px;
+}
+.home-container {
+    padding: 20px;
+    border: 1px solid #eff1ff;
+    background: #fafafa;
+}

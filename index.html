@@ -3,71 +3,31 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Frontend Vuejs API</title>
-    <!-- Library VueJS & Axios -->
+    <title>SPA Frontend VueJS & Vue Router</title>
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script src="https://unpkg.com/vue-router@4/dist/vue-router.global.js"></script>
     <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
-    <!-- CSS -->
     <link rel="stylesheet" href="assets/css/style.css">
 </head>
 <body>
     <div id="app">
-        <h1>Daftar Artikel (VueJS)</h1>
-        
-        <button id="btn-tambah" @click="tambah">Tambah Data</button>
+        <header>
+            <h1>Aplikasi Panel Single Page (SPA)</h1>
+            <nav class="nav-menu">
+                <router-link to="/">Beranda</router-link> |
+                <router-link to="/artikel">Kelola Artikel</router-link> |
+                <router-link to="/about">About Me</router-link>
+            </nav>
+        </header>
 
-        <table>
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Judul</th>
-                    <th>Status</th>
-                    <th>Aksi</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr v-for="(row, index) in artikel" :key="row.id">
-                    <td class="center-text">{{ row.id }}</td>
-                    <td>{{ row.judul }}</td>
-                    <td>{{ statusText(row.status) }}</td>
-                    <td class="center-text">
-                        <a href="#" @click.prevent="edit(row)">Edit</a> |
-                        <a href="#" @click.prevent="hapus(index, row.id)">Hapus</a>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
-
-        <!-- Modal Form Tambah/Ubah Data -->
-        <div class="modal" v-if="showForm">
-            <div class="modal-content">
-                <span class="close" @click="showForm = false">&times;</span>
-                <form id="form-data" @submit.prevent="saveData">
-                    <h3 id="form-title">{{ formTitle }}</h3>
-                    
-                    <div>
-                        <input type="text" name="judul" id="judul" v-model="formData.judul" placeholder="Judul Artikel" required> 
-                    </div>
-                    <div>
-                        <textarea name="isi" id="isi" rows="10" v-model="formData.isi" placeholder="Isi Artikel..." required></textarea>
-                    </div>
-                    <div>
-                        <select name="status" id="status" v-model="formData.status">
-                            <option v-for="option in statusOptions" :value="option.value">
-                                {{ option.text }}
-                            </option>
-                        </select>
-                    </div>
-                    
-                    <input type="hidden" id="id" v-model="formData.id">
-                    <button type="submit" id="btnSimpan">Simpan</button>
-                    <button type="button" @click="showForm = false">Batal</button>
-                </form>
-            </div>
-        </div>
+        <main style="margin-top: 20px;">
+            <router-view></router-view>
+        </main>
     </div>
 
-    <!-- Script Vue App -->
+    <script src="assets/js/components/Home.js"></script>
+    <script src="assets/js/components/Artikel.js"></script>
+    <script src="assets/js/components/About.js"></script>
     <script src="assets/js/app.js"></script>
 </body>
 </html>
