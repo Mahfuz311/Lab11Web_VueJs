@@ -83,5 +83,58 @@ Aplikasi kini berjalan penuh sebagai SPA. Saat menu navigasi diklik, halaman ber
 <img src="https://github.com/Mahfuz311/Lab11Web_VueJs/blob/7df9a8b091a3ae4f84efc9de14d3638e9ba25faf/ss/praktikum12.3.png">
 
 ---
+
+# Laporan Praktikum 13: VueJS Autentikasi dan Navigation Guards (SPA Security)
+
+## Tujuan Praktikum
+1. Memahami konsep keamanan dan pembatasan hak akses rute pada sisi klien (*Client-Side Security*).
+2. Memahami konsep *Navigation Guards* (`beforeEach`) pada Vue Router.
+3. Membuat API Endpoint autentikasi pada backend CodeIgniter 4.
+4. Mengimplementasikan modul Login dan proteksi halaman admin pada aplikasi Single Page Application (SPA) Frontend API.
+
+---
+
+## 🧩 Langkah-Langkah Praktikum
+
+### 1. Pembuatan API Endpoint Login (Sisi Backend CI4)
+- Membuat *controller* baru bernama `Auth.php` di dalam direktori `app/Controllers/Api/`.
+- Membangun fungsi `login()` yang bertugas menerima input *username* dan *password* dari *request body* JSON, lalu memvalidasinya dengan data di tabel `user` database.
+- Mengonfigurasi respons API. Jika berhasil, API mengembalikan status 200 beserta token *base64_encode*. Jika gagal, mengembalikan status 401 (*Unauthorized*).
+- Mendaftarkan rute API khusus pada `app/Config/Routes.php` dengan metode POST (`$routes->post('api/login', 'Api\Auth::login');`).
+
+### 2. Pengembangan Integrasi Frontend (Sisi VueJS SPA)
+- **Komponen Login (`Login.js`):** Membuat antarmuka form login yang menangkap input pengguna dan mengirimkannya ke API Backend menggunakan Axios POST. Jika respons sukses, status `isLoggedIn` dan `userToken` disimpan ke dalam `localStorage` browser.
+- **Konfigurasi Proteksi Rute (`app.js`):** - Menambahkan properti `meta: { requiresAuth: true }` pada rute `/artikel` dan `/about` agar terkunci.
+  - Mengimplementasikan **Navigation Guards** menggunakan `router.beforeEach`. Fungsi ini bertindak sebagai "satpam" yang mencegat pengguna jika mencoba mengakses rute terkunci tanpa memiliki status login yang valid di `localStorage`, lalu mengarahkannya paksa ke halaman `/login`.
+- **Modifikasi Tata Letak (`index.html`):** Menerapkan direktif `v-if` dan `v-else` pada menu navigasi untuk merubah tombol "Login" menjadi "Logout" secara dinamis berdasarkan status autentikasi pengguna.
+- **Desain Antarmuka (`style.css`):** Menambahkan CSS khusus agar kotak form login tampil rapi dan presisi di tengah layar.
+
+### 3. Hasil Pengujian Skenario Keamanan
+- **Skenario A (Akses Ditolak):** Saat mencoba menekan menu "Kelola Artikel" atau "About Me" dalam keadaan belum login, sistem langsung memunculkan *alert* peringatan dan membelokkan (*redirect*) paksa halaman ke form Login.
+- **Skenario B (Akses Diterima):** Saat memasukkan kredensial yang valid, Axios berhasil melakukan HTTP POST ke backend CI4, dan pengguna langsung diarahkan ke halaman tabel manajemen artikel dengan menu yang berubah menjadi "Logout".
+
+<img src="https://github.com/Mahfuz311/Lab11Web_VueJs/blob/9c1085912276fd42c98f2982a07592fc5f487e72/ss/praktikum13.1.png">
+<img src="https://github.com/Mahfuz311/Lab11Web_VueJs/blob/9c1085912276fd42c98f2982a07592fc5f487e72/ss/praktikum13.2.png">
+<img src="https://github.com/Mahfuz311/Lab11Web_VueJs/blob/9c1085912276fd42c98f2982a07592fc5f487e72/ss/praktikum13.3.png">
+
+
+### Analisis Alur Kerja Fungsional Keamanan SPA
+
+**1. Alur Kerja `router.beforeEach` (Navigation Guards)**
+Dalam arsitektur SPA VueJS, `router.beforeEach` bertindak sebagai *interceptor* (pencegat) atau "satpam" di sisi klien yang akan tereksekusi sebelum browser merender halaman yang dituju. 
+- Saat pengguna mencoba mengakses rute internal (misalnya `/artikel` atau `/about`), fungsi ini pertama-tama akan mengecek apakah rute tersebut dilindungi oleh properti `meta: { requiresAuth: true }`.
+- Jika rute tersebut dilindungi, sistem akan memeriksa keberadaan status `isLoggedIn` di dalam `localStorage` browser.
+- Jika status valid (pengguna sudah *login*), sistem akan memanggil fungsi `next()` untuk mengizinkan pengguna masuk ke halaman yang dituju.
+- Sebaliknya, jika pengguna belum *login*, perpindahan halaman akan dibatalkan, memunculkan *alert* peringatan akses ditolak, dan mengalihkan pengguna secara paksa (`next('/login')`) ke halaman form login.
+
+**2. Alur Kerja Axios HTTP Post pada Form Login**
+Axios digunakan sebagai perantara komunikasi asinkron antara antarmuka VueJS dan API backend CodeIgniter 4.
+- Saat pengguna menekan tombol login, fungsi `handleLogin()` akan mengambil data dari *input* formulir (*username* dan *password*).
+- Axios kemudian mengirimkan data tersebut menggunakan metode `POST` ke *endpoint* autentikasi CI4 (`http://localhost:8080/api/login`).
+- Backend CodeIgniter akan memvalidasi data tersebut ke dalam database. Jika kredensial sesuai, backend merespons dengan status `200` beserta data token.
+- Axios di sisi frontend akan menangkap respons sukses ini (`.then(response => ...)`), lalu menyimpan status `isLoggedIn` dan `userToken` ke dalam `localStorage` browser.
+- Setelah data sesi berhasil disimpan, Vue Router secara programatis mengarahkan (`push`) pengguna menuju halaman tabel artikel.
+
+---
 **Repository by:** Mahfuz Fauzi
 **Mata Kuliah:** Pemrograman Web 2
