@@ -136,5 +136,46 @@ Axios digunakan sebagai perantara komunikasi asinkron antara antarmuka VueJS dan
 - Setelah data sesi berhasil disimpan, Vue Router secara programatis mengarahkan (`push`) pengguna menuju halaman tabel artikel.
 
 ---
+
+# Laporan Praktikum 14: Keamanan API, Autentikasi Token, dan Axios Interceptors
+
+## Tujuan Praktikum
+1. Memahami konsep keamanan RESTful API menggunakan *Token-Based Authentication*.
+2. Mengimplementasikan *Filters* pada CodeIgniter 4 untuk mengamankan *endpoint* API.
+3. Mengimplementasikan Axios Interceptors pada aplikasi Frontend VueJS.
+4. Melakukan pengujian transmisi data aman secara *end-to-end*.
+
+---
+
+## 🧩 Langkah-Langkah Praktikum
+
+### 1. Mengamankan Endpoint API (Sisi Backend CI4)
+- Membuat `ApiAuthFilter.php` di dalam `app/Filters/` untuk mencegat setiap *request* yang masuk. Filter ini bertugas mengecek keberadaan dan validitas token pada HTTP Header `Authorization`. Jika token tidak ada atau tidak valid, server langsung menolak dengan status HTTP 401 (Unauthorized).
+- Mendaftarkan alias filter `apiauth` pada `app/Config/Filters.php`.
+- Menerapkan filter tersebut pada `app/Config/Routes.php` khusus untuk rute yang memanipulasi data sensitif (POST, PUT, DELETE pada *resource* post).
+
+### 2. Implementasi Axios Interceptors (Sisi VueJS Frontend)
+- Mengonfigurasi `axios.interceptors.request.use` pada file `app.js`. Fitur ini berfungsi sebagai kurir otomatis yang mengambil token dari `localStorage` dan menyuntikkannya ke dalam *header* `Authorization: Bearer <token>` pada setiap *request* yang mengarah ke server.
+- Mengonfigurasi `axios.interceptors.response.use` untuk menangkap respons *error* secara global. Jika server mengembalikan status 401, sistem akan memberikan *alert*, menghapus sesi, dan memaksa pengguna kembali ke halaman Login.
+
+### 3. Hasil Pengujian dan Bukti Keamanan
+**Bukti 1: Simulasi Akses Ilegal via Postman**
+Saat mencoba melakukan POST data secara langsung ke *endpoint* API tanpa menyertakan Token, CodeIgniter 4 berhasil memblokir akses tersebut dan merespons dengan pesan *error* 401 Unauthorized.
+<img src="https://github.com/Mahfuz311/Lab11Web_VueJs/blob/8001c4e241f9f16156949d302153ddf3399a3dfe/ss/praktikum14.1.png">
+
+**Bukti 2: Pengujian Transmisi Data Aman di Browser**
+Setelah melakukan login, seluruh proses manipulasi data (Tambah/Ubah/Hapus) berhasil dilakukan berkat Axios Interceptor. Pada inspeksi *Developer Tools (Network Tab)*, terlihat jelas bahwa *header* `Authorization` telah disematkan secara otomatis di latar belakang.
+<img src="https://github.com/Mahfuz311/Lab11Web_VueJs/blob/8001c4e241f9f16156949d302153ddf3399a3dfe/ss/praktikum14.2.png">
+
+---
+
+## Kesimpulan Analisis Keamanan (Vue Router vs CI4 Filters)
+Terdapat perbedaan mendasar dalam fungsi perlindungan keamanan antara Vue Router (Client-side) dan CodeIgniter Filters (Server-side):
+- **Vue Router Navigation Guards (`beforeEach`):** Hanya berfungsi sebagai "Gembok Visual/Antarmuka". Ia melindungi antarmuka aplikasi dengan mencegah pengguna yang belum login melihat komponen halaman tertentu di browser. Namun, ini **tidak melindungi data di database**.
+- **CodeIgniter 4 Filters (`ApiAuthFilter`):** Berfungsi sebagai "Gembok Sistem/Infrastruktur". Ini adalah keamanan sejati yang melindungi *database* dan logika *backend*. Walaupun penyerang tidak menggunakan antarmuka VueJS (misalnya menggunakan Postman atau terminal), mereka tetap tidak bisa memanipulasi data tanpa memiliki Token Kriptografi yang valid. Kedua sistem ini wajib diimplementasikan secara bersamaan untuk menciptakan *Full-Stack Security* yang sempurna.
+
+---
+**Selesai! Repository by:** Mahfuz Fauzi | **Mata Kuliah:** Pemrograman Web 2
+
 **Repository by:** Mahfuz Fauzi
 **Mata Kuliah:** Pemrograman Web 2
